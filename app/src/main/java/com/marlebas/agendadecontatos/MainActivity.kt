@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                 startDestination = "listaContatos" //Rota da primeira tela que será mostrada
             ){
                 composable("listaContatos") { //Rota da tela que para qual migrará
-                    ListaContatos() //Tela que será rendirizada
+                    ListaContatos(navController = navController) //Tela que será rendirizada
                 }
 
                 composable("salvarContato") {
