@@ -15,6 +15,7 @@ import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.marlebas.agendadecontatos.ui.theme.AgendaDeContatosTheme
 import com.marlebas.agendadecontatos.views.AtualizarContato
 import com.marlebas.agendadecontatos.views.ListaContatos
@@ -40,8 +41,24 @@ class MainActivity : ComponentActivity() {
                     SalvarContato()
                 }
 
-                composable("atualizarContato") {
-                    AtualizarContato()
+                composable(
+                    "atualizarContato/{id}/{nome}/{sobrenome}/{telefone}",
+                    arguments = listOf(
+                        navArgument(name = "id"){},
+                        navArgument(name = "nome"){},
+                        navArgument(name = "sobrenome"){},
+                        navArgument(name = "telefone"){}
+
+                    ) //Passando o argumento ID pra nossa rota
+                ) {
+                    AtualizarContato(
+                        navController,
+                        it.arguments?.getString("id").toString(),
+                        it.arguments?.getString("nome").toString(),
+                        it.arguments?.getString("sobrenome").toString(),
+                        it.arguments?.getString("telefone").toString()
+
+                    )
                 }
             }
         }

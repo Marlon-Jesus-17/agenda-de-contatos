@@ -19,13 +19,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.marlebas.agendadecontatos.model.Contato
 import com.marlebas.agendadecontatos.ui.theme.WHITE
 
 @Composable
 fun ContatoItem(
-    contato: Contato
+    contato: Contato,
+    navController: NavController
 ){
+
+    val id = contato.id
 
     Card(
         modifier = Modifier
@@ -60,7 +65,9 @@ fun ContatoItem(
                 horizontalArrangement = Arrangement.End
             ) {
                 IconButton(
-                    onClick = {}
+                    onClick = {
+                        navController.navigate("atualizarContato/$id/${contato.nome}/${contato.sobrenome}/${contato.telefone}")
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
@@ -86,5 +93,8 @@ fun ContatoItem(
 @Preview
 @Composable
 private fun ContatoItemPreview(){
-    ContatoItem(contato = Contato( nome = "Marlon", sobrenome = "Jesus", telefone = "95555-6666"))
+    ContatoItem(
+        contato = Contato( nome = "Marlon", sobrenome = "Jesus", telefone = "95555-6666"),
+        navController = rememberNavController()
+    )
 }
