@@ -1,5 +1,6 @@
 package com.marlebas.agendadecontatos.views
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,20 +18,37 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.marlebas.agendadecontatos.AppDatabase
 import com.marlebas.agendadecontatos.componentes.ButtonCustom
 import com.marlebas.agendadecontatos.componentes.OutlinedTextFieldCurstom
+import com.marlebas.agendadecontatos.dao.ContatoDAO
+import com.marlebas.agendadecontatos.model.Contato
 import com.marlebas.agendadecontatos.ui.theme.PURPLE500
 import com.marlebas.agendadecontatos.ui.theme.WHITE
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+private lateinit var contatoDAO: ContatoDAO
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SalvarContato(){
+
+    var nome by remember { mutableStateOf("") }
+    var sobrenome by remember { mutableStateOf("") }
+    var telefone by remember { mutableStateOf("") }
+    var mensagem by remember { mutableStateOf(false) }
+
+    var scope = rememberCoroutineScope()
+    var context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -43,10 +61,6 @@ fun SalvarContato(){
             )
         }
     ) { paddingValues ->
-
-        var nome by remember { mutableStateOf("") }
-        var sobrenome by remember { mutableStateOf("") }
-        var telefone by remember { mutableStateOf("") }
 
         Column(
             modifier = Modifier
@@ -105,7 +119,31 @@ fun SalvarContato(){
             )
 
             ButtonCustom(
-                onClick = {},
+                onClick = {
+
+                    scope.launch(
+                        Dispatchers.IO //Explicitando que é uma trhead paralela
+                    ){
+                        if(nome.isEmpty() || telefone.isEmpty()){
+                            mensagem = false
+                        }else{
+                            mensagem = true
+                            val contato = Contato(nome = nome, sobrenome = sobrenome, telefone = telefone)
+                            contatoDAO = AppDatabase.getInstance(context).contatoDAO()
+                            contatoDAO.salvar(contato)
+                        }
+                    }
+
+                    scope.launch(
+                        Dispatchers.Main //Explicitando que não é uma trhead parelela e sim a principal
+                    ){
+                        if(mensagem){
+                            Toast.makeText(context, "Sucesso ao salvar contato", Toast.LENGTH_SHORT).show()
+                        }else{
+                            Toast.makeText(context, "Preencha o nome e telefone", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
                 "Salvar"
             )
         }
